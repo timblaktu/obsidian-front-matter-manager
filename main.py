@@ -5,6 +5,7 @@
 CLI for Managing Front-matter in Markdown Files.
 """
 
+import frontmatter
 import argparse
 import logging
 import os
@@ -12,8 +13,6 @@ import pathlib
 import shutil
 import sys
 import tempfile
-
-import frontmatter
 
 def main(obsidian_vault_root, required_tags=None, dry_run=False):
     """
@@ -44,10 +43,14 @@ def main(obsidian_vault_root, required_tags=None, dry_run=False):
                     continue
             else:
                 md['tags'] = []
-            md['tags'] = sorted(set(md['tags'] + required_tags))
+            if required_tags:
+                md['tags'] = sorted(set(md['tags'] + required_tags))
+            else:
+                md['tags'] = sorted(set(md['tags']))
             # Write modified md object (front-matter + content) to temp file
             root = tmp_vault_root if dry_run else obsidian_vault_root
-            filename_to_write = os.path.join(root, filename)
+            # filename_to_write = os.path.join(root, filename)
+            filename_to_write = os.path.join(root, rootdirpath, filename)
             with open(filename_to_write, 'wb') as f:
                 frontmatter.dump(md, f)
             logger.debug(f"\t{filename}: {md['tags']}")
