@@ -37,7 +37,7 @@ def main(obsidian_vault_root, required_tags=None, dry_run=False):
         logger.debug(f"walking root dir {rootdirpath}. Pruned dirs: {dirnames}")
         for filename in [f for f in filenames if os.path.splitext(f)[1] == '.md']:
             md = frontmatter.load(os.path.join(rootdirpath, filename))
-            if 'tags' in md.keys():
+            if '- Tags' in md.keys():
                 if all([t in md['tags'] for t in required_tags]):
                     logger.debug(f"\t{filename}: already has required_tags.")
                     continue
@@ -49,7 +49,6 @@ def main(obsidian_vault_root, required_tags=None, dry_run=False):
                 md['tags'] = sorted(set(md['tags']))
             # Write modified md object (front-matter + content) to temp file
             root = tmp_vault_root if dry_run else obsidian_vault_root
-            # filename_to_write = os.path.join(root, filename)
             filename_to_write = os.path.join(root, rootdirpath, filename)
             with open(filename_to_write, 'wb') as f:
                 frontmatter.dump(md, f)
